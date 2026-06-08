@@ -5,13 +5,25 @@ import authService from "../services/auth.service";
 import orderService from "../services/order.service";
 
 
-export const getAllIssues = async (req: Request, res: Response) => {
-  const { sort, type, status } = req.query;
-  const issues = await OrderIssues.getAllissues();
-  sendResponse(res, {
-    message: "Orders retrieved successfully",
-    data: issues,
-  });
+
+
+export const getAllIssues = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { sort, type, status } = req.query;
+
+    const issues = await orderService.getAllIssues({
+      sort: sort as string,
+      type: type as string,
+      status: status as string,
+    });
+
+    sendResponse(res, {
+      message: "Issues retrieved successfully",
+      data: issues,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const createIssue = async (req: Request, res: Response, next:NextFunction) => {
@@ -23,13 +35,13 @@ export const createIssue = async (req: Request, res: Response, next:NextFunction
     
   
   const { title, description, type } = req.body;
-  const reporter_id:any = req.user.id;
+  const reporter_id = req.user.id;
 
    if (!title || !description || !type) {
       return sendResponse(res, { message: "All fields are required", error: true }, 400);
     }
 
-  const newissue = await OrderIssues.createIssue({
+  const newIssue = await OrderIssues.createIssue({
     reporter_id,
     title,
     description,
@@ -37,9 +49,9 @@ export const createIssue = async (req: Request, res: Response, next:NextFunction
     status:"open",
   });
   sendResponse(res, {
-    message: "Issue created successfully",
-    data: newissue,
-  });
+      message: "Issue created successfully",
+      data: newIssue,
+    }, 201);
   } catch (error) {
     next(error);
   }
@@ -60,7 +72,7 @@ export const getSingleIssue = async (req: Request, res: Response, next: NextFunc
     }
 
     sendResponse(res, {
-      message: "Issue retrieved successfullyyyy",
+      message: "Issue retrieved successfully",
       data: issue,
     });
   } catch (error) {

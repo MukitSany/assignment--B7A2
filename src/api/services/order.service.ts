@@ -32,21 +32,6 @@ class OrderIssues {
   return updated;
 }
 
-//   async getIssueById(id: number) {
-//   const [issue] = await sql`
-//     SELECT 
-//       i.id,i.title,i.description,i.type,i.status,i.created_at,i.updated_at,
-//       json_build_object(
-//         'id', u.id,
-//         'name', u.name,
-//         'role', u.role
-//       ) AS reporter
-//     FROM issues i
-//     JOIN users u ON i.reporter_id = u.id
-//     WHERE i.id = ${id}
-//   `;
-//   return issue;
-// }
 
 
 async getIssueById(id: number) {
@@ -83,10 +68,50 @@ async getIssueById(id: number) {
   };
 }
 
-  async getAllissues() {
-    const issues = await sql`SELECT * FROM issues`;
-    return issues;
-  }
+  
+
+  async getAllIssues(filters: { sort?: string; type?: string; status?: string }) {
+  const { sort, type, status } = filters;
+  const order = sort === "oldest" ? sql`ASC` : sql`DESC`;
+
+  const issues = await sql`
+    SELECT
+      id,
+      title,
+      description,
+      type,
+      status,
+      reporter_id,
+      created_at,
+      updated_at
+    FROM issues
+    WHERE
+      (${type ?? null}::text IS NULL OR type = ${type ?? null}::text)
+      AND (${status ?? null}::text IS NULL OR status = ${status ?? null}::text)
+    ORDER BY created_at ${order}
+  `;
+
+  if (issues.length === 0) return [];
+
+  const reporterIds = [...new Set(issues.map((i) => i.reporter_id))];
+  const reporters = await sql`
+    SELECT id, name, role FROM users
+    WHERE id = ANY(${reporterIds as number[]})
+  `;
+
+  const reporterMap = Object.fromEntries(reporters.map((r) => [r.id, r]));
+
+  return issues.map((issue) => ({
+    id: issue.id,
+    title: issue.title,
+    description: issue.description,
+    type: issue.type,
+    status: issue.status,
+    reporter: reporterMap[issue.reporter_id] ?? null,
+    created_at: issue.created_at,
+    updated_at: issue.updated_at,
+  }));
+}
   
 
   async deleteAllIssues() {
