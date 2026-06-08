@@ -32,20 +32,55 @@ class OrderIssues {
   return updated;
 }
 
-  async getIssueById(id: number) {
+//   async getIssueById(id: number) {
+//   const [issue] = await sql`
+//     SELECT 
+//       i.id,i.title,i.description,i.type,i.status,i.created_at,i.updated_at,
+//       json_build_object(
+//         'id', u.id,
+//         'name', u.name,
+//         'role', u.role
+//       ) AS reporter
+//     FROM issues i
+//     JOIN users u ON i.reporter_id = u.id
+//     WHERE i.id = ${id}
+//   `;
+//   return issue;
+// }
+
+
+async getIssueById(id: number) {
   const [issue] = await sql`
-    SELECT 
-      i.id,i.title,i.description,i.type,i.status,i.created_at,i.updated_at,
-      json_build_object(
-        'id', u.id,
-        'name', u.name,
-        'role', u.role
-      ) AS reporter
+    SELECT
+      i.id,
+      i.title,
+      i.description,
+      i.type,
+      i.status,
+      i.reporter_id,
+      i.created_at,
+      i.updated_at
     FROM issues i
-    JOIN users u ON i.reporter_id = u.id
     WHERE i.id = ${id}
   `;
-  return issue;
+
+  if (!issue) return null;
+
+  const [reporter] = await sql`
+    SELECT id, name, role FROM users
+    WHERE id = ${issue.reporter_id}
+  `;
+
+  return {
+    id: issue.id,
+    title: issue.title,
+    description: issue.description,
+    type: issue.type,
+    status: issue.status,
+    reporter: reporter ?? null,
+    created_at: issue.created_at,
+    updated_at: issue.updated_at,
+  };
 }
 
   async getAllissues() {
