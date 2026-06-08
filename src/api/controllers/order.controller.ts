@@ -34,7 +34,7 @@ export const createIssue = async (req: Request, res: Response, next:NextFunction
     }
     
   
-  const { title, description, type } = req.body;
+  const { title, description, type,status } = req.body;
   const reporter_id = req.user.id;
 
    if (!title || !description || !type) {
@@ -46,7 +46,7 @@ export const createIssue = async (req: Request, res: Response, next:NextFunction
     title,
     description,
     type,
-    status:"open",
+    status,
   });
   sendResponse(res, {
       message: "Issue created successfully",

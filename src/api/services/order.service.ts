@@ -24,6 +24,7 @@ class OrderIssues {
     SET
       title = COALESCE(${data.title ?? null}, title),
       description = COALESCE(${data.description ?? null}, description),
+      status = 'in_progress',
       type = COALESCE(${data.type ?? null}, type),
       updated_at = NOW()
     WHERE id = ${id}
@@ -117,6 +118,18 @@ async getIssueById(id: number) {
   async deleteAllIssues() {
     await sql`DELETE FROM issues`;
   }
+
+  async deleteIssue(id: number) {
+  const [deleted] = await sql`
+    DELETE FROM issues
+    WHERE id = ${id}
+    RETURNING *
+  `;
+  return deleted;
 }
+
+}
+
+
 
 export default new OrderIssues();
