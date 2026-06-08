@@ -52,15 +52,7 @@ class OrderIssues {
     const issues = await sql`SELECT * FROM issues`;
     return issues;
   }
-
-  async deleteIssue(id: number) {
-  const [deleted] = await sql`
-    DELETE FROM issues
-    WHERE id = ${id}
-    RETURNING *
-  `;
-  return deleted;
-}
+  
 
   async deleteAllIssues() {
     await sql`DELETE FROM issues`;

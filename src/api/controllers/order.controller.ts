@@ -6,6 +6,7 @@ import orderService from "../services/order.service";
 
 
 export const getAllIssues = async (req: Request, res: Response) => {
+  const { sort, type, status } = req.query;
   const issues = await OrderIssues.getAllissues();
   sendResponse(res, {
     message: "Orders retrieved successfully",
@@ -67,23 +68,7 @@ export const getSingleIssue = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-// export const updateIssue = async (req: Request, res: Response) => {
-//   const userId = req.user?.id;
 
-//   if (!userId) {
-//     return sendResponse(res, { message: "Unauthorized", error: true }, 401);
-//   }
-
-//   const { id,title,description,type,status,reporter_id,created_at,updated_at } = req.body;
-
-//   const updated = await authService.updateIssue(userId, {id,title,description,type,status,reporter_id,created_at,updated_at});
-
-//   if (!updated) {
-//     return sendResponse(res, { message: "Failed to update user", error: true }, 400);
-//   }
-
-//   sendResponse(res, { message: "User updated successfully", data: updated }, 200);
-// };
 
 export const updateIssue = async (req: Request, res: Response, next: NextFunction) => {
   try {
