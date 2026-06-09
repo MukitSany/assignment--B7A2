@@ -36,10 +36,10 @@ export const login = async (req: Request, res: Response) => {
         secure: false
     })
 
-    const result = { accessToken,
+    const result = { refreshToken,
         user: user,
         // accessToken,
-        refreshToken
+        // refreshToken
     }
 
     return sendResponse(res,{message:"Login successful", data:result})

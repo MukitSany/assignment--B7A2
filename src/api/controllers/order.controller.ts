@@ -46,7 +46,7 @@ export const createIssue = async (req: Request, res: Response, next:NextFunction
     title,
     description,
     type,
-    status,
+    status: "open",
   });
   sendResponse(res, {
       message: "Issue created successfully",
