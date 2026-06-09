@@ -20,7 +20,7 @@ export const getAllIssues = async (req: Request, res: Response, next: NextFuncti
     sendResponse(res, {
       message: "Issues retrieved successfully",
       data: issues,
-    });
+    },200);
   } catch (error) {
     next(error);
   }
@@ -35,7 +35,7 @@ export const createIssue = async (req: Request, res: Response, next:NextFunction
     
   
   const { title, description, type,status } = req.body;
-  const reporter_id = req.user.id;
+  const reporter_id = +req.user.id;
 
    if (!title || !description || !type) {
       return sendResponse(res, { message: "All fields are required", error: true }, 400);
@@ -50,7 +50,7 @@ export const createIssue = async (req: Request, res: Response, next:NextFunction
   });
   sendResponse(res, {
       message: "Issue created successfully",
-      data: newIssue,
+      data: newIssue as any,
     }, 201);
   } catch (error) {
     next(error);
@@ -74,7 +74,7 @@ export const getSingleIssue = async (req: Request, res: Response, next: NextFunc
     sendResponse(res, {
       message: "Issue retrieved successfully",
       data: issue,
-    });
+    },200);
   } catch (error) {
     next(error);
   }
@@ -101,7 +101,7 @@ export const updateIssue = async (req: Request, res: Response, next: NextFunctio
     const { role, id: userId } = req.user;
 
     if (role === "contributor") {
-      if (issue.reporter.id !== userId) {
+      if (!issue.reporter || issue.reporter.id !== userId) {
         return sendResponse(res, { message: "You can only update your own issues", error: true }, 403);
       }
       if (issue.status !== "open") {
@@ -111,11 +111,11 @@ export const updateIssue = async (req: Request, res: Response, next: NextFunctio
 
     const { title, description, type } = req.body;
 
-    const updatedIssue = await orderService.updateIssue(id, { title, description, type });
+    const updatedIssues = await orderService.updateIssue(id, { title, description, type });
 
     sendResponse(res, {
       message: "Issue updated successfully",
-      data: updatedIssue,
+      data: updatedIssues as any,
     });
   } catch (error) {
     next(error);
@@ -143,7 +143,7 @@ export const deleteIssue = async (req: Request, res: Response, next: NextFunctio
 
     sendResponse(res, {
       message: "Issue deleted successfully",
-    });
+    },200);
   } catch (error) {
     next(error);
   }
@@ -153,5 +153,5 @@ export const deleteAllIssues = async (req: Request, res: Response) => {
   await OrderIssues.deleteAllIssues();
   sendResponse(res, {
     message: "All issues deleted successfully",
-  });
+  },200);
 };
