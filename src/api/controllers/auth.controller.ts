@@ -28,15 +28,15 @@ export const login = async (req: Request, res: Response) => {
         
     }
 
-    const {accessToken,refreshToken} = signToken(user)
+    const {accessToken,token} = signToken(user)
 
-    res.cookie("refreshToken",refreshToken,{
+    res.cookie("refreshToken",token,{
         sameSite: "lax",
         httpOnly: true,
         secure: false
     })
 
-    const result = { refreshToken,
+    const result = { token,
         user: user,
         // accessToken,
         // refreshToken
@@ -78,7 +78,7 @@ export const refresh = async (req:Request, res: Response) =>{
         return sendResponse(res, {message:"User not found"},401)
     }
 
-    const {accessToken,refreshToken:NewRefreshToken} = signToken(user)
+    const {accessToken,token:NewRefreshToken} = signToken(user)
 
     res.cookie("refreshToken", NewRefreshToken,{
         secure:false,

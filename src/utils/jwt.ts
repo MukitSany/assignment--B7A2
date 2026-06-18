@@ -16,11 +16,11 @@ export const signToken = (payload: RUser) => {
         expiresIn: "2d"
     })
 
-    const refreshToken = jwt.sign(payload, config.refress_secret,{
+    const token = jwt.sign(payload, config.refress_secret,{
         expiresIn: "10d"
     })
 
-    return {accessToken, refreshToken}
+    return {accessToken, token}
     
 };
 
